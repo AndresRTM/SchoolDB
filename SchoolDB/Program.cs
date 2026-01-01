@@ -22,6 +22,7 @@ namespace SchoolDB
 
                 var input = Console.ReadLine();
                 List<Student> students = context.Students.ToList();
+                List<Class> classes = context.Classes.ToList();
                 switch (input)
                 {
 
@@ -41,7 +42,7 @@ namespace SchoolDB
                                 Console.WriteLine($"{s.FirstName} {s.LastName}");
                             }
                         }
-                        
+
                         if (input.Equals("2"))
                         {
                             var sortedFnameDesc = students.OrderByDescending(s => s.FirstName);
@@ -53,15 +54,46 @@ namespace SchoolDB
 
                         if (input.Equals("3"))
                         {
-
+                            var sortedLnameAsc = students.OrderBy(s => s.LastName);
+                            foreach (var s in sortedLnameAsc)
+                            {
+                                Console.WriteLine($"{s.LastName} {s.FirstName}");
+                            }
 
                         }
 
                         if (input.Equals("4"))
                         {
-
+                            var sortedLnameDesc = students.OrderByDescending(s => s.LastName);
+                            foreach (var s in sortedLnameDesc)
+                            {
+                                Console.WriteLine($"{s.LastName} {s.FirstName}");
+                            }
 
                         }
+                        break;
+
+                    case "2":
+                        foreach (var c in classes)
+                        {
+                            Console.WriteLine($"{c.ClassName}");
+                        }
+
+                        Console.WriteLine("Select a class by it´s name to list all the students belonging to it");                        
+                        var i = Console.ReadLine();                        
+                        foreach (var c in classes)
+                        {
+                            if(i == c.ClassName)
+                            {
+                                int classID = c.ClassId;
+                                List<Student> l = students.Where(i => i.FkclassId == classID).ToList();
+                                foreach (var s in l)
+                                {
+                                    Console.WriteLine($"{s.FirstName} {s.LastName}");
+                                }                                
+                            }
+                        }
+
                         break;
 
                     default:
