@@ -79,26 +79,48 @@ namespace SchoolDB
                             Console.WriteLine($"{c.ClassName}");
                         }
 
-                        Console.WriteLine("Select a class by it´s name to list all the students belonging to it");                        
-                        var i = Console.ReadLine();                        
+                        Console.WriteLine("Select a class by it´s name to list all the students belonging to it");
+                        var i = Console.ReadLine();
                         foreach (var c in classes)
                         {
-                            if(i == c.ClassName)
+                            if (i == c.ClassName)
                             {
                                 int classID = c.ClassId;
                                 List<Student> l = students.Where(i => i.FkclassId == classID).ToList();
                                 foreach (var s in l)
                                 {
                                     Console.WriteLine($"{s.FirstName} {s.LastName}");
-                                }                                
+                                }
                             }
                         }
-
                         break;
-
+                    case "3":
+                        var newStudent = new Student();
+                        Console.WriteLine("Firstname:");
+                        newStudent.FirstName = Console.ReadLine();
+                        Console.WriteLine("Lastname:");
+                        newStudent.LastName = Console.ReadLine();
+                        Console.WriteLine("Birthday (Format: XXXXXXXX-XXXX)");
+                        newStudent.PersonalIdentityNumber = Console.ReadLine();
+                        Console.WriteLine("ClassID 1-10");
+                        int classId;
+                        while (true)
+                        {
+                            var classInput = Console.ReadLine();
+                            if (int.TryParse(classInput, out classId) && classId >= 1 && classId <= 10)
+                            {
+                                newStudent.FkclassId = classId;
+                                break;
+                            }
+                            Console.WriteLine("Invalid input. Please enter a number between 1 and 10:");
+                        }
+                        context.Students.Add(newStudent);
+                        context.SaveChanges();
+                        break;
                     default:
                         break;
                 }
+
             }
 
         }
