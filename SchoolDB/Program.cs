@@ -117,6 +117,44 @@ namespace SchoolDB
                         context.Students.Add(newStudent);
                         context.SaveChanges();
                         break;
+                    case "4":
+                        Console.WriteLine("1. List all staff");
+                        Console.WriteLine("2. List staff by role");
+                        var inp = Console.ReadLine();
+                        if (inp == "1")
+                        {
+                            List<Staff> staffs = context.Staff.ToList();
+                            foreach (var staff in staffs)
+                            {
+                                Console.WriteLine($"{staff.FirstName} {staff.LastName} - {staff.Role}");
+                            }
+                        }
+                        if (inp == "2")
+                        {
+                            Console.WriteLine("Enter rolename:");
+                            var roleInput = Console.ReadLine();
+                            var listOfRoles = context.Staff.Where(s => s.Role == roleInput).ToList();
+                            foreach (var s in listOfRoles)
+                            {
+                                Console.WriteLine($"{s.FirstName} {s.LastName} - {s.Role}");
+                            }
+
+                        }
+                        break;
+
+                    case "5":
+                        var newStaff = new Staff();
+                        Console.WriteLine("Firstname:");
+                        Console.ReadLine();
+                        newStaff.FirstName = Console.ReadLine();
+                        Console.WriteLine("Lastname:");
+                        newStaff.LastName = Console.ReadLine();
+                        Console.WriteLine("Role:");
+                        newStaff.Role = Console.ReadLine();
+                        context.Staff.Add(newStaff);
+                        context.SaveChanges();
+
+                        break;
                     default:
                         break;
                 }
