@@ -120,6 +120,7 @@ namespace SchoolDB
                     case "4":
                         Console.WriteLine("1. List all staff");
                         Console.WriteLine("2. List staff by role");
+                        Console.WriteLine("3. Overview of staff by role");
                         var inp = Console.ReadLine();
                         if (inp == "1")
                         {
@@ -139,6 +140,20 @@ namespace SchoolDB
                                 Console.WriteLine($"{s.FirstName} {s.LastName} - {s.Role}");
                             }
 
+                        }
+
+                        if (inp == "3")
+                        {
+                            var overviewStaffByRole = context.Staff.GroupBy(s => s.Role).Select
+                                (g => new
+                                {
+                                    Division = g.Key, TotalCountEmploye = g.Count()
+                                }).OrderByDescending(x => x.TotalCountEmploye);
+
+                            foreach (var s in overviewStaffByRole)
+                            {
+                                Console.WriteLine($"{s.Division}: {s.TotalCountEmploye}");
+                            }
                         }
                         break;
 
