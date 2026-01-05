@@ -41,6 +41,43 @@ namespace SchoolDB
                             {
                                 Console.WriteLine($"{s.FirstName} {s.LastName}");
                             }
+                            var studentInfo = context.Students
+                           .Join(context.Classes,
+                               s => s.FkclassId,
+                               c => c.ClassId,
+                               (s, c) => new { Student = s, Class = c })
+                           .GroupJoin(context.Grades,
+                               sc => sc.Student.StudentId,
+                               g => g.FkstudentId,
+                               (sc, grades) => new
+                               {
+                                   StudentName = sc.Student.FirstName + " " + sc.Student.LastName,
+                                   ClassName = sc.Class.ClassName,
+                                   Courses = grades.Join(context.Courses,
+                                       g => g.FkcourseId,
+                                       co => co.CourseId,
+                                       (g, co) => new
+                                       {
+                                           CourseName = co.CourseName,
+                                           Grade = g.Grade1,
+                                           GradeDate = g.GradeDate
+                                       }).ToList()
+                               })
+                           .ToList();
+
+
+
+                            foreach (var st in studentInfo)
+                            {
+                                Console.WriteLine($"\nStudent: {st.StudentName}");
+                                Console.WriteLine($"Class: {st.ClassName}");
+                                Console.WriteLine("Courses and Grades:");
+
+                                foreach (var course in st.Courses)
+                                {
+                                    Console.WriteLine($"  - {course.CourseName}: {course.Grade} ({course.GradeDate:yyyy-MM-dd})");
+                                }
+                            }
                         }
 
                         if (input.Equals("2"))
@@ -147,7 +184,8 @@ namespace SchoolDB
                             var overviewStaffByRole = context.Staff.GroupBy(s => s.Role).Select
                                 (g => new
                                 {
-                                    Division = g.Key, TotalCountEmploye = g.Count()
+                                    Division = g.Key,
+                                    TotalCountEmploye = g.Count()
                                 }).OrderByDescending(x => x.TotalCountEmploye);
 
                             foreach (var s in overviewStaffByRole)
