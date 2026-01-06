@@ -19,10 +19,13 @@ namespace SchoolDB
                 Console.WriteLine("3. Add student");
                 Console.WriteLine("4. List staff");
                 Console.WriteLine("5. Add staff");
+                Console.WriteLine("6. List active courses");
 
                 var input = Console.ReadLine();
                 List<Student> students = context.Students.ToList();
                 List<Class> classes = context.Classes.ToList();
+                List<Course> courses = context.Courses.ToList();
+
                 switch (input)
                 {
 
@@ -41,6 +44,7 @@ namespace SchoolDB
                             {
                                 Console.WriteLine($"{s.FirstName} {s.LastName}");
                             }
+
                             var studentInfo = context.Students
                            .Join(context.Classes,
                                s => s.FkclassId,
@@ -65,8 +69,6 @@ namespace SchoolDB
                                })
                            .ToList();
 
-
-
                             foreach (var st in studentInfo)
                             {
                                 Console.WriteLine($"\nStudent: {st.StudentName}");
@@ -87,6 +89,42 @@ namespace SchoolDB
                             {
                                 Console.WriteLine($"{s.FirstName} {s.LastName}");
                             }
+
+                            var studentInfo = context.Students
+                        .Join(context.Classes,
+                            s => s.FkclassId,
+                            c => c.ClassId,
+                            (s, c) => new { Student = s, Class = c })
+                        .GroupJoin(context.Grades,
+                            sc => sc.Student.StudentId,
+                            g => g.FkstudentId,
+                            (sc, grades) => new
+                            {
+                                StudentName = sc.Student.FirstName + " " + sc.Student.LastName,
+                                ClassName = sc.Class.ClassName,
+                                Courses = grades.Join(context.Courses,
+                                    g => g.FkcourseId,
+                                    co => co.CourseId,
+                                    (g, co) => new
+                                    {
+                                        CourseName = co.CourseName,
+                                        Grade = g.Grade1,
+                                        GradeDate = g.GradeDate
+                                    }).ToList()
+                            })
+                        .ToList();
+
+                            foreach (var st in studentInfo)
+                            {
+                                Console.WriteLine($"\nStudent: {st.StudentName}");
+                                Console.WriteLine($"Class: {st.ClassName}");
+                                Console.WriteLine("Courses and Grades:");
+
+                                foreach (var course in st.Courses)
+                                {
+                                    Console.WriteLine($"  - {course.CourseName}: {course.Grade} ({course.GradeDate:yyyy-MM-dd})");
+                                }
+                            }
                         }
 
                         if (input.Equals("3"))
@@ -97,6 +135,42 @@ namespace SchoolDB
                                 Console.WriteLine($"{s.LastName} {s.FirstName}");
                             }
 
+                            var studentInfo = context.Students
+                        .Join(context.Classes,
+                            s => s.FkclassId,
+                            c => c.ClassId,
+                            (s, c) => new { Student = s, Class = c })
+                        .GroupJoin(context.Grades,
+                            sc => sc.Student.StudentId,
+                            g => g.FkstudentId,
+                            (sc, grades) => new
+                            {
+                                StudentName = sc.Student.FirstName + " " + sc.Student.LastName,
+                                ClassName = sc.Class.ClassName,
+                                Courses = grades.Join(context.Courses,
+                                    g => g.FkcourseId,
+                                    co => co.CourseId,
+                                    (g, co) => new
+                                    {
+                                        CourseName = co.CourseName,
+                                        Grade = g.Grade1,
+                                        GradeDate = g.GradeDate
+                                    }).ToList()
+                            })
+                        .ToList();
+
+                            foreach (var st in studentInfo)
+                            {
+                                Console.WriteLine($"\nStudent: {st.StudentName}");
+                                Console.WriteLine($"Class: {st.ClassName}");
+                                Console.WriteLine("Courses and Grades:");
+
+                                foreach (var course in st.Courses)
+                                {
+                                    Console.WriteLine($"  - {course.CourseName}: {course.Grade} ({course.GradeDate:yyyy-MM-dd})");
+                                }
+                            }
+
                         }
 
                         if (input.Equals("4"))
@@ -105,6 +179,42 @@ namespace SchoolDB
                             foreach (var s in sortedLnameDesc)
                             {
                                 Console.WriteLine($"{s.LastName} {s.FirstName}");
+                            }
+
+                            var studentInfo = context.Students
+                        .Join(context.Classes,
+                            s => s.FkclassId,
+                            c => c.ClassId,
+                            (s, c) => new { Student = s, Class = c })
+                        .GroupJoin(context.Grades,
+                            sc => sc.Student.StudentId,
+                            g => g.FkstudentId,
+                            (sc, grades) => new
+                            {
+                                StudentName = sc.Student.FirstName + " " + sc.Student.LastName,
+                                ClassName = sc.Class.ClassName,
+                                Courses = grades.Join(context.Courses,
+                                    g => g.FkcourseId,
+                                    co => co.CourseId,
+                                    (g, co) => new
+                                    {
+                                        CourseName = co.CourseName,
+                                        Grade = g.Grade1,
+                                        GradeDate = g.GradeDate
+                                    }).ToList()
+                            })
+                        .ToList();
+
+                            foreach (var st in studentInfo)
+                            {
+                                Console.WriteLine($"\nStudent: {st.StudentName}");
+                                Console.WriteLine($"Class: {st.ClassName}");
+                                Console.WriteLine("Courses and Grades:");
+
+                                foreach (var course in st.Courses)
+                                {
+                                    Console.WriteLine($"  - {course.CourseName}: {course.Grade} ({course.GradeDate:yyyy-MM-dd})");
+                                }
                             }
 
                         }
@@ -206,8 +316,19 @@ namespace SchoolDB
                         newStaff.Role = Console.ReadLine();
                         context.Staff.Add(newStaff);
                         context.SaveChanges();
-
                         break;
+
+                    case "6":
+                        var activeCourse = courses.Where(c => c.Active == "Yes");
+
+                        foreach (var c in activeCourse)
+                        {
+                            Console.WriteLine(c.CourseName);
+                        }
+                        break;
+
+
+
                     default:
                         break;
                 }
