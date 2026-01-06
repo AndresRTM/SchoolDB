@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.Identity.Client;
 using SchoolDB.Data;
 using SchoolDB.Models;
 namespace SchoolDB
@@ -20,6 +21,8 @@ namespace SchoolDB
                 Console.WriteLine("4. List staff");
                 Console.WriteLine("5. Add staff");
                 Console.WriteLine("6. List active courses");
+                Console.WriteLine("7. Set Grade");
+
 
                 var input = Console.ReadLine();
                 List<Student> students = context.Students.ToList();
@@ -327,13 +330,69 @@ namespace SchoolDB
                         }
                         break;
 
+                    case "7":
+                        using (var transaction = context.Database.BeginTransaction())
+                        {
+                            int studentID = IntInputHelper("Provide StudentID:");
+                            int courseID = IntInputHelper("Provide CourseID:");
+                            int stID = IntInputHelper("Provide StaffID:");
+                            Console.WriteLine("Provide Grade");
+                            string gradeValue = Console.ReadLine();
 
+                            try
+                            {
+                                var student = context.Students.Find(studentID);
+                                var courseidentification = context.Students.Find(courseID);
+                                var Staffidentification = context.Students.Find(stID);
 
-                    default:
-                        break;
+                                if (student == null || courseidentification == null || Staffidentification == null)
+                                {
+                                    throw new Exception("Ogiltig student, kurs eller lärare!");
+                                }
+
+                                var newGrade = new Grade()
+                                {
+                                    Grade1 = gradeValue,
+                                    GradeDate = DateOnly.FromDateTime(DateTime.Now),
+                                    FkstaffId = stID,
+                                    FkstudentId = studentID,
+                                    FkcourseId = courseID
+                                };
+
+                                context.Grades.Add(newGrade);
+                                context.SaveChanges();
+
+                                transaction.Commit();
+                                Console.WriteLine($"The grade {gradeValue} was successfully put!");
+
+                            }
+                            catch (Exception e)
+                            {
+                                transaction.Rollback();
+                                Console.WriteLine("The grading was unsuccessfully");
+                                throw;
+                            }
+                            break;
+                        }
                 }
 
             }
+
+        }
+
+        static int IntInputHelper(string prompt)
+        {
+            Console.WriteLine(prompt);
+            string input = Console.ReadLine();
+            int result;
+
+            while (!int.TryParse(input, out result))
+            {
+                Console.WriteLine("The input has to be of numerical value. Try again:");
+                input = Console.ReadLine();
+            }
+
+            return result;
 
         }
     }
